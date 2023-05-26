@@ -4,7 +4,7 @@ const findOrCreate = require("mongoose-findorcreate");
 
 const UserSchema = new mongoose.Schema(
   {
-    username: { type: String },
+    username: { type: String, unique: true },
     email: { type: String, unique: true },
     password: { type: String },
     phone: { type: String },
@@ -29,7 +29,6 @@ const UserSchema = new mongoose.Schema(
       default: "ROLE_MEMBER",
       enum: ["ROLE_MEMBER", "ROLE_ADMIN"],
     },
-
     followers: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -46,6 +45,14 @@ const UserSchema = new mongoose.Schema(
     ],
     bio: {
       type: String,
+    },
+    secretQuestion: {
+      type: String,
+      required: true,
+    },
+    secretAnswer: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

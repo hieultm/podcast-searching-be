@@ -78,18 +78,69 @@ const getDetailPodcast = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const getRecommendPodcasts = asyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const podcastData = await Podcast.aggregate([
+        {
+          $project: {
+            user: 1,
+            audio: 1,
+            uploadDate: 1,
+            background: 1,
+            caption: 1,
+            content: 1,
+            likes: { $size: "$likes" },
+            comments: 1,
+          },
+        },
+        { $sort: { likes: -1 } },
+        { $limit: 5 },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        { $unwind: "$user" },
+        {
+          $project: {
+            "user.username": 1,
+            audio: 1,
+            uploadDate: 1,
+            background: 1,
+            caption: 1,
+            content: 1,
+            likes: 1,
+            comments: 1,
+          },
+        },
+      ]);
+
+      res.status(200).json({
+        podcastData,
+      });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+);
+
 const searchContentPodcast = asyncHandler(
   async (req: Request, res: Response) => {
-    const searchKeyword = req.query.content;
+    let searchKeyword = req.query.content;
 
     try {
       let regex: RegExp;
 
       if (typeof searchKeyword === "string") {
+        searchKeyword = decodeURIComponent(searchKeyword);
         regex = new RegExp(searchKeyword, "i");
       } else {
-        const keywordString = JSON.stringify(searchKeyword); // convert to string using JSON.stringify()
-        regex = new RegExp(keywordString, "i");
+        const keywordString = JSON.stringify(searchKeyword);
+        regex = new RegExp(decodeURIComponent(keywordString), "i");
       }
 
       const podcastData = await Podcast.find({
@@ -99,6 +150,7 @@ const searchContentPodcast = asyncHandler(
       if (!podcastData) {
         return res.status(404).json({ message: "The podcast does not exist." });
       }
+
       res.status(200).json({
         podcastData,
       });
@@ -144,4 +196,5 @@ export {
   getDetailPodcast,
   searchContentPodcast,
   deletePodcastById,
+  getRecommendPodcasts,
 };

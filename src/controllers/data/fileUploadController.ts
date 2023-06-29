@@ -26,7 +26,6 @@ const audioFileUpload = asyncHandler(async (req: any, res: Response) => {
     }
 
     let urlCloudinary = audioFile[0].path;
-    // return transcript from python file
     const transcript = await client.createTranscript({
       audio_url: urlCloudinary,
     });

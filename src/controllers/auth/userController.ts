@@ -29,11 +29,17 @@ const getUserProfile = asyncHandler(async (req: IUserReq, res: Response) => {
 
 const updateProfile = asyncHandler(async (req: IUserReq, res: Response) => {
   const user = await User.findById(req.params.id);
-
+  const newUsername = req.body.username;
+  const newAvatar = req?.file?.path;
+  const usernameExits = await User.findOne({ username: newUsername });
   try {
+    if (usernameExits) {
+      return res.status(400).json(" Username already exist");
+    }
+
     if (user) {
-      user.username = req.body.username || user.username;
-      user.avatar = req?.file?.path || user.avatar;
+      user.username = newUsername || user.username;
+      user.avatar = newAvatar || user.avatar;
       // if (req.body.password) {
       //   user.password = req.body.password;
       // }

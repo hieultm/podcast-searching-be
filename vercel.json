@@ -12,5 +12,9 @@
       "dest": "/src/index.ts"
     }
   ],
-  "regions": ["sin1"]
+  "regions": ["sin1"],
+  "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  }
 }

@@ -108,6 +108,7 @@ const getRecommendPodcasts = asyncHandler(
         {
           $project: {
             "user.username": 1,
+            "user.avatar": 1,
             audio: 1,
             uploadDate: 1,
             background: 1,
